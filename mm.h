@@ -8,8 +8,10 @@
 #include <string>
 #include <algorithm>
 #include <sys/mman.h>
+#if NUMA
 #include <numa.h>
 #include <numaif.h>
+#endif // NUMA
 #include <vector>
 #define MAP_HUGETLB 0x40000
 //#define FLAGS (MAP_PRIVATE|MAP_ANON|MAP_HUGETLB)

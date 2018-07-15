@@ -954,8 +954,18 @@ partitioned_vertices edgeMap(partitioned_graph<vertex> GA, partitioned_vertices 
     {
       Localfrontier.toDense(coo_part);
       v1 = partitioned_vertices::dense(numVertices,coo_part);
-      if (m+TotalOutDegrees > denseThreshold && !GA.part_ver)
+      if (
+#if DISABLE_COO
+	  false
+#elif !DISABLE_CSC
+	  m+TotalOutDegrees > denseThreshold && !GA.part_ver
+#else
+	  true
+#endif
+	  )
       {
+	  assert( !GA.part_ver ); // missing COO
+	  
 	    map_partitionL( coo_part, [&]( int p ) {
                         edgeMapDense(GA.get_edge_list_partition(p),Localfrontier.d, Localfrontier.bit, f, v1.d);
                 } );
@@ -1100,7 +1110,11 @@ int parallel_main(int argc, char* argv[])
     bool binary = P.getOptionValue("-b");             //Galois binary format
     long start = P.getOptionLongValue("-r",100);      //start vertex for BFS,BC and BellmanFord
     long rounds = P.getOptionLongValue("-rounds",3); // Usually 20 rounds
+#if NUMA
     int numOfNode = P.getOptionLongValue("-p", 4);    // NUMA node number
+#else
+    int numOfNode = 1;    // NUMA node number
+#endif
     int numOfCoo = P.getOptionLongValue("-c", 384);   // Partition number for COO
     char *part_how = P.getOptionValue("-P");          // Parition method, default is partition by destination
     char *vertex_edge = P.getOptionValue("-v");       // vertex/edge oriented, default is edge

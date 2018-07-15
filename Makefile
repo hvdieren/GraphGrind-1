@@ -1,6 +1,7 @@
 #define the long 64--bit for large scale graph
 INTT = -DLONG 
-PCC = /var/shared/gcc-7.3.0/bin/g++
+#PCC = /var/shared/gcc-7.3.0/bin/g++
+PCC = g++-mp-7
 #PCC = icc
 PCFLAGS = -fcilkplus -lcilkrts -O3 -DCILK=1 $(INTT) $(INTE) -I ./cilk-swan/include -L ./cilk-swan/lib -ldl  
 COMMON=papi_code.h utils.h IO.h parallel.h gettime.h quickSort.h parseCommandLine.h mm.h partitioner.h graph-numa.h ligra-numa.h

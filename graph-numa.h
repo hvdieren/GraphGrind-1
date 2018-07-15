@@ -4,7 +4,9 @@
 #include <stdlib.h>
 #include "parallel.h"
 #include <assert.h>
+#if NUMA
 #include "numa_page_check.h"
+#endif // NUMA
 #include "mm.h"
 #include <unistd.h>
 #include <sched.h>
@@ -15,8 +17,10 @@
 #include <algorithm>
 
 #include <sys/mman.h>
+#if NUMA
 #include <numaif.h>
 #include <numa.h>
+#endif // NUMA
 
 #ifndef EDGES_HILBERT
 #define EDGES_HILBERT 0
@@ -682,6 +686,20 @@ public:
             cscpartitionByDegree(CSCGraph,coo_part,CSCGraph.csc.as_array(),partition_source, partition_relabel);
         CSCGraph.csc.compute_starts(); 
 
+	// Report contents of partitions
+	std::cerr << "Partition balance:\nV (%):";
+	for( int p=0; p < coo_partition.get_num_partitions(); ++p ) {
+	    std::cerr << ' ' << (100.0*float(coo_partition.get_size(p))/float(CSCGraph.n));
+	}
+	std::cerr << "\nE (%):";
+	for( int p=0; p < coo_partition.get_num_partitions(); ++p ) {
+	    intT edges = 0;
+	    for( intT v=coo_partition.start_of(p);
+		 v < coo_partition.start_of(p+1); ++v )
+		edges += CSCGraph.V[v].getInDegree();
+	    std::cerr << ' ' << (100.0*float(edges)/float(CSCGraph.m));
+	}
+	std::cerr << "\n";
     }
     void del()
     {
@@ -1245,7 +1263,7 @@ void partitioned_graph<vertex>::cscpartitionByDegree(graph<vertex> GA, int numOf
     {
         edges[counter]+=degrees[i];
         sizeArr[counter]++;
-        if (edges[counter]<averageDegree && degrees[i+1]+edges[counter]> 1.1*averageDegree)
+        if (edges[counter]<averageDegree && degrees[i+1]+edges[counter]> 1.1*averageDegree && counter < numOfNode-1)
             counter++;
         if (edges[counter]>=averageDegree && counter <numOfNode-1)
             counter++;
