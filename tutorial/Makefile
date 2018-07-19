@@ -1,5 +1,6 @@
 #define the long 64--bit for large scale graph
-INTT = -DLONG 
+#INTT = -DLONG 
+INTT = 
 CXXFLAGS = -fcilkplus -lcilkrts -O3 -DCILK=1 $(INTT) $(INTE) -I .. -I ../cilk-swan/include -L ../cilk-swan/lib -ldl  
 HDR=papi_code.h utils.h IO.h parallel.h gettime.h quickSort.h parseCommandLine.h mm.h partitioner.h graph-numa.h ligra-numa.h
 COMMON=$(patsubst %,../%,$(HDR))
