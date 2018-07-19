@@ -1350,7 +1350,7 @@ void partitioned_graph<vertex>::partitionByDegree(wholeGraph<vertex> GA, int num
     {
         edges[counter]+=degrees[i];
         sizeArr[counter]++;
-        if (edges[counter]<averageDegree && degrees[i+1]+edges[counter]> 1.1*averageDegree)
+        if (edges[counter]<averageDegree && degrees[i+1]+edges[counter]> 1.1*averageDegree && counter < numOfNode-1)
             counter++;
         if (edges[counter]>=averageDegree && counter <numOfNode-1)
             counter++;
